@@ -98,6 +98,7 @@ public class NeuronNetwork2 {
                 backPropagation();
 
                 Double[] outputArr = new Double[outputNum];
+
                 Double[] desiredArr = new Double[outputNum];
                 Double[] get = new Double[outputNum];
 //                System.out.println("desired: ");
@@ -123,9 +124,19 @@ public class NeuronNetwork2 {
 //                    System.out.println(get[i] + "\t");
                 }
 
+                int neg_false, neg_true, pos_false, pos_true = 0;
+                neg_false = neg_true = pos_false = pos_true;
+
                 for (int i = 0; i < outputNum; i++) {
-                    if (get[i].equals(desiredArr[i]))
-                        correct++;
+                    boolean equals = get[i].equals(desiredArr[i]);
+                    if (equals && get[i].equals(1.0))
+                        pos_true++;
+                    else if(equals && get[i].equals(0.0))
+                        neg_true++;
+                    else if(!equals && get[i].equals(0.0))
+                        pos_false++;
+                    else if(!equals && get[i].equals(1.0))
+                        neg_false++;
                 }
             }
             avgError += correct / (training_dataSet.size() * outputNum) * 100;
