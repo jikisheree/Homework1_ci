@@ -53,12 +53,12 @@ public class Data2_Manager {
                         }
 
                         if (lines % 3 == 0) {
-                            if (lines % 10 == 0) {
+                            if (lines % 10 == dataSet) {
                                 sub_testing_desired.add(temp);
                             } else
                                 sub_training_desired.add(temp);
                         } else if ((lines + 1) % 3 == 0) {
-                            if ((lines + 1) % 10 == 0) {
+                            if ((lines + 1) % 10 == dataSet) {
                                 sub_testing_dataSet.add(temp);
                             } else
                                 sub_training_dataSet.add(temp);
@@ -80,26 +80,27 @@ public class Data2_Manager {
         inFile = path;
     }
 
-    public static Data2_Manager getData(){
-        return data;}
+    public static Data2_Manager getData() {
+        return data;
+    }
 
-    public static List<List<Double>> getTrainData(int dataSet){
+    public static List<List<Double>> getTrainData(int dataSet) {
         return training_dataSet.get(dataSet);
     }
 
-    public static List<List<Double>> getTrainDs(int dataSet){
+    public static List<List<Double>> getTrainDs(int dataSet) {
         return training_desired.get(dataSet);
     }
 
-    public static List<List<Double>> getTestData(int dataSet){
+    public static List<List<Double>> getTestData(int dataSet) {
         return testing_dataSet.get(dataSet);
     }
 
-    public static List<List<Double>> getTestDs(int dataSet){
+    public static List<List<Double>> getTestDs(int dataSet) {
         return testing_desired.get(dataSet);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         Data2_Manager.getData();
 

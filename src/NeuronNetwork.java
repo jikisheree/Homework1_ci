@@ -8,18 +8,21 @@ public class NeuronNetwork {
     protected Double bias;
     protected Double learningRate;
     protected Double mmRate;
-    private List<List<Double>> training_dataSet, training_desired, testing_dataSet, testing_desired;
+    private final List<List<Double>> training_dataSet;
+    private final List<List<Double>> training_desired;
+    private final List<List<Double>> testing_dataSet;
+    private final List<List<Double>> testing_desired;
     private Double[][] node, local_gradient;
     private int[] nodeLayer;
     private WeightGraph[] weightOfLayer;
     private WeightGraph[] changedWeight;
-    private Double error[];
+    private Double[] error;
     private int weightLayerNum;
     private int nodeLayerNum;
-    private int dataSet;
+    private final int dataSet;
 
     public NeuronNetwork(Double minError, Double learningRate, Double mm, int maxEpoch, Double bias,
-                         int[] hidden, int dataSet){
+                         int[] hidden, int dataSet) {
 
         this.minError = minError;
         this.learningRate = learningRate;
@@ -28,62 +31,68 @@ public class NeuronNetwork {
         this.mmRate = mm;
         this.dataSet = dataSet;
 
-        this.training_dataSet = Data2_Manager.getTrainData(this.dataSet);
-        this.training_desired = Data2_Manager.getTrainDs(this.dataSet);
-        this.testing_dataSet = Data2_Manager.getTestData(this.dataSet);
-        this.testing_desired = Data2_Manager.getTestDs(this.dataSet);
+        this.training_dataSet = Data1_Manager.getTrainData(this.dataSet);
+        this.training_desired = Data1_Manager.getTrainDs(this.dataSet);
+        this.testing_dataSet = Data1_Manager.getTestData(this.dataSet);
+        this.testing_desired = Data1_Manager.getTestDs(this.dataSet);
 
         nodeBuilding(hidden);
 
     }
 
-    public void nodeBuilding(int[] hidden){
+    public void nodeBuilding(int[] hidden) {
 
         int hNum = hidden.length;
-        this.nodeLayer = new int[hNum+2];
-        this.nodeLayer[0] = training_dataSet.get(0).size();
-        for (int i=1; i<=hNum+1; i++){
+        this.nodeLayer = new int[hNum + 2];
+        // add input nodes
+        this.nodeLayer[0] = training_dataSet.get(dataSet).size();
+        for (int i = 1; i <= hNum + 1; i++) {
 
-            if(i==hNum+1){
-                this.nodeLayer[i] = training_desired.get(0).size();
+            if (i == hNum + 1) {
+                // add output nodes
+                this.nodeLayer[i] = training_desired.get(dataSet).size();
                 this.error = new Double[this.nodeLayer[i]];
-            }else
-                this.nodeLayer[i] = hidden[i-1];
+            } else
+                // add hidden nodes
+                this.nodeLayer[i] = hidden[i - 1];
 
         }
+        // store total number of layers
         this.nodeLayerNum = nodeLayer.length;
-
+        // store total number of line between layer (weight)
+        this.weightLayerNum = nodeLayerNum-1;
+        // matrix to store value of each node in each layer
         this.node = new Double[nodeLayerNum][];
+        //// matrix to store local gradient of each node in each layer
         this.local_gradient = new Double[nodeLayerNum][];
 
-        for(int i=0; i<nodeLayerNum; i++){
+        for (int i = 0; i < nodeLayerNum; i++) {
             this.node[i] = new Double[nodeLayer[i]];
             this.local_gradient[i] = new Double[nodeLayer[i]];
         }
 
-        this.weightOfLayer = new WeightGraph[nodeLayerNum-1];
-        this.changedWeight = new WeightGraph[nodeLayerNum-1];
+        // matrix of overall neuron network
+        this.weightOfLayer = new WeightGraph[weightLayerNum];
+        this.changedWeight = new WeightGraph[weightLayerNum];
 
-        for(int i=0; i< weightOfLayer.length; i++){
-            weightOfLayer[i] = new WeightGraph(nodeLayer[i+1], nodeLayer[i], true);
-            changedWeight[i] = new WeightGraph(nodeLayer[i+1], nodeLayer[i], false);
+        for (int i = 0; i < weightLayerNum; i++) {
+            weightOfLayer[i] = new WeightGraph(nodeLayer[i + 1], nodeLayer[i], true);
+            changedWeight[i] = new WeightGraph(nodeLayer[i + 1], nodeLayer[i], false);
         }
-
-        this.weightLayerNum = weightOfLayer.length;
 
     }
 
-    public void training(){
+    public void training() {
 
-        System.out.println("================= TRAINING =================");
+        System.out.println("================= TRAINING " + (dataSet + 1) + " =================");
         int n = 0;
-        Double avgError = 10000.0;
+        double avgError = 10000.0;
         int inNodeNum = nodeLayer[0];
         Random ranDataLine = new Random();
-        while (n<maxEpoch && avgError>minError) {
-            Double sum_error = 0.0;
+        while (n < maxEpoch && avgError > minError) {
+            double sum_error = 0.0;
             // insert input value to node
-            for(int l=0; l<training_dataSet.size(); l++){
+            for (int l = 0; l < training_dataSet.size(); l++) {
                 int lineNum = ranDataLine.nextInt(training_dataSet.size());
 
                 for (int i = 0; i < inNodeNum; i++) {
@@ -94,28 +103,28 @@ public class NeuronNetwork {
                 errorCalculation(lineNum, true);
                 backPropagation();
 
-                double d = Data1_Manager.getTrainDs(dataSet).get(lineNum).get(0)*700 ;
-                double g = node[nodeLayerNum-1][0]*700;
-                System.out.println("desired:" + (int)d + " get: "+ g + "\t error_n: " + Math.abs(d-g));
+                double d = training_desired.get(lineNum).get(0) * 700;
+                double g = node[nodeLayerNum - 1][0] * 700;
+//                System.out.println("desired:" + (int)d + " get: "+ g + "\t error_n: " + Math.abs(d-g));
 
-                sum_error+=0.5*Math.pow(error[0], 2);
+                sum_error += 0.5 * Math.pow(error[0], 2);
             }
-            avgError = sum_error/training_dataSet.size();
-            System.out.println(n +"\t" + avgError);
+            avgError = sum_error / training_dataSet.size();
+//            System.out.println("N epoch: "+n +"\t" + avgError);
             n++;
         }
 
-        System.out.println("final Average error: "+ avgError);
+        System.out.println("final Average error: " + avgError);
     }
 
-    public void testing(){
+    public void testing() {
 
         System.out.println("================= TESTING =================");
-        Double avgError = 10000.0;
+        double avgError;
         int inNodeNum = nodeLayer[0];
-        Double sum_error = 0.0;
+        double sum_error = 0.0;
 
-        for(int l=0; l<Data1_Manager.testing_dataSet.size(); l++) {
+        for (int l = 0; l < Data1_Manager.testing_dataSet.size(); l++) {
             // insert input value to node
             for (int i = 0; i < inNodeNum; i++) {
                 this.node[0][i] = Data1_Manager.getTestData(dataSet).get(l).get(i);
@@ -124,128 +133,92 @@ public class NeuronNetwork {
             feedForward();
             errorCalculation(l, false);
 
-            double d = Data1_Manager.getTestDs(dataSet).get(l).get(0)*700 ;
-            double g = node[nodeLayerNum-1][0]*700;
-            System.out.println("desired:" + (int)d + " get: "+ g + "\t error_n: " + Math.abs(d-g));
+            double d = Data1_Manager.getTestDs(dataSet).get(l).get(0) * 700;
+            double g = node[nodeLayerNum - 1][0] * 700;
+            System.out.println("desired:" + (int) d + " get: " + g + "\t error_n: " + Math.abs(d - g));
 
-            sum_error+=0.5*Math.pow(error[0], 2);
+            sum_error += 0.5 * Math.pow(error[0], 2);
         }
-        avgError = sum_error/Data1_Manager.testing_dataSet.size();
+        avgError = sum_error / Data1_Manager.testing_dataSet.size();
 
-        System.out.println("Average error: "+ avgError);
+        System.out.println("Average error: " + avgError);
     }
 
-    public void feedForward(){
+    public void feedForward() {
 
-        for(int i=0; i<weightLayerNum;i++){
+        for (int i = 0; i < weightLayerNum; i++) {
             // number of node in each layer
-            int nodeAfterNum = nodeLayer[i+1];
+            int nodeAfterNum = nodeLayer[i + 1];
             int nodeBeforeNum = nodeLayer[i];
 
-            for(int row=0; row<nodeAfterNum; row++){
-                Double sum = 0.0;
-                for (int col=0; col<nodeBeforeNum; col++){
+            // node in previous layer will be row and next layer will be column
+            for (int row = 0; row < nodeAfterNum; row++) {
+                double sum = 0.0;
+                for (int col = 0; col < nodeBeforeNum; col++) {
                     // weight of each line * value of node before line
                     Double weightOfLine = this.weightOfLayer[i].getWeight(row, col);
-                    sum += (weightOfLine*activation(node[i][col]));
+                    sum += (weightOfLine * activation(node[i][col]));
                 }
-                node[i+1][row] = sum + bias;
+                node[i + 1][row] = sum + bias;
             }
         }
     }
 
-    public void errorCalculation(int lineNum, boolean ifTrain){
+    public void errorCalculation(int lineNum, boolean ifTrain) {
 
         Double desired;
         // nodeLayerNUm-1 = index of node layer output
-        for (int i=0; i< nodeLayer[nodeLayerNum-1]; i++) {
-            if(ifTrain == true)
+        for (int i = 0; i < nodeLayer[nodeLayerNum - 1]; i++) {
+            if (ifTrain)
                 desired = training_desired.get(lineNum).get(i);
             else
                 desired = testing_desired.get(lineNum).get(i);
             this.error[i] = desired - node[nodeLayerNum - 1][i];
+            // activation function of output layer is linear
             this.local_gradient[nodeLayerNum - 1][i] = this.error[i];
         }
     }
 
-    public void backPropagation() {
+    private void backPropagation() {
 
-        // finding delta weight from output
-        deltaWeightOutput();
         // finding local gradient in hidden layer
-        localGradient();
         //finding delta weight in hidden layer
-        deltaWeight();
         // changing all weight in all layer
-        weightChanging();
-
-    }
-
-    private void deltaWeightOutput(){
-        // finding delta weight from output
-        // iteration output
-        for (int row = 0; row < nodeLayer[nodeLayerNum - 1]; row++) {
-            // iteration node in layer before output
-            for (int col = 0; col < nodeLayer[nodeLayerNum - 2]; col++) {
-                Double cw = (mmRate*changedWeight[weightLayerNum-1].getWeight(row, col)) +
-                        (learningRate*this.error[row]*activation(this.node[nodeLayerNum - 2][col]));
-                changedWeight[weightLayerNum-1].setWeight(row, col,cw);
-            }
-        }
-    }
-
-    private void localGradient(){
 
         // each layer form backward
-        for(int layer=weightLayerNum-1; layer>=0; layer--){
+        for (int layer = weightLayerNum - 1; layer >= 0; layer--) {
             // each node in layer before weight line
-            for(int j = 0; j< nodeLayer[layer]; j++) {
-                Double sum = 0.0;
+            for (int j = 0; j < nodeLayer[layer]; j++) {
+                double sum = 0.0;
                 // each node in layer after weight line
-                for(int k = 0; k< nodeLayer[layer+1]; k++) {
-                    sum += local_gradient[layer+1][k] * weightOfLayer[layer].getWeight(k, j);
+                for (int k = 0; k < nodeLayer[layer + 1]; k++) {
+                    sum += local_gradient[layer + 1][k] * weightOfLayer[layer].getWeight(k, j);
                 }
                 local_gradient[layer][j] = activation_diff(node[layer][j]) * sum;
-            }
-        }
-    }
+                for (int k = 0; k < nodeLayer[layer + 1]; k++) {
 
-    private void deltaWeight(){
+                    Double cw = (mmRate * changedWeight[layer].getWeight(k, j)) +
+                            (learningRate * local_gradient[layer + 1][k] * activation(node[layer][j]));
 
-        for(int layer=weightLayerNum-2; layer>=0; layer--){
-            for(int j = 0; j< nodeLayer[layer+1] ; j++) {
-                for(int i = 0; i < nodeLayer[layer] ; i++) {
-                    Double cw = (mmRate*changedWeight[layer].getWeight(j,i)) +
-                            (learningRate*local_gradient[layer+1][j]*activation(node[layer][i]));
-                    changedWeight[layer].setWeight(j, i, cw);
+                    changedWeight[layer].setWeight(k, j, cw);
+
+                    weightOfLayer[layer].setWeight(k, j,
+                            (weightOfLayer[layer].getWeight(k, j) + changedWeight[layer].getWeight(k, j)));
                 }
             }
         }
     }
 
-    private void weightChanging() {
-
-        // changing all weight in all layer
-        for(int layer=weightLayerNum-1; layer>=0; layer--){
-            for(int row = 0; row< nodeLayer[layer+1]; row++) {
-                for(int col = 0; col< nodeLayer[layer]; col++) {
-                    weightOfLayer[layer].setWeight(row, col,
-                            (weightOfLayer[layer].getWeight(row, col) + changedWeight[layer].getWeight(row, col)));
-                }
-            }
-        }
-    }
-
-    public double activation(Double value){
+    public double activation(Double value) {
         // tanh
-        return (Math.exp(value)-Math.exp(-value))/(Math.exp(value)+Math.exp(-value));
+        return (Math.exp(value) - Math.exp(-value)) / (Math.exp(value) + Math.exp(-value));
         // relu
 //        return Math.max(0.01, value);
     }
 
-    public double activation_diff(Double value){
+    public double activation_diff(Double value) {
         // tanh
-        return 1.0-Math.pow(activation(value), 2);
+        return 1.0 - Math.pow(activation(value), 2);
 //        if(value<=0) return  0.01;
 //        else return 1;
     }
