@@ -75,16 +75,19 @@ public class NeuronNetwork2 {
 
     public void training() {
 
-        System.out.println("================= TRAINING "+(dataSet+1)+" =================");
+        System.out.println("\n================= TRAINING "+(dataSet+1)+" =================");
         int n = 0;
-        double avgError = 0.0;
         double correct = 0.0;
+        double miss;
         int inNodeNum = nodeLayer[0];
         Random ranDataLine = new Random();
         int outputNum = nodeLayer[nodeLayerNum - 1];
 
-        while (n < maxEpoch) {
-            Double sum_error = 0.0;
+        while (n < maxEpoch && correct<99) {
+
+            int neg_false, neg_true, pos_false, pos_true = 0;
+            neg_false = neg_true = pos_false = pos_true;
+
             // insert input value to node
             for (int l = 0; l < training_dataSet.size(); l++) {
                 int lineNum = ranDataLine.nextInt(training_dataSet.size());
@@ -124,38 +127,40 @@ public class NeuronNetwork2 {
 //                    System.out.println(get[i] + "\t");
                 }
 
-                int neg_false, neg_true, pos_false, pos_true = 0;
-                neg_false = neg_true = pos_false = pos_true;
+                boolean equals = get[0].equals(desiredArr[0]);
+                if (equals && get[0].equals(1.0))
+                    pos_true++;
+                else if (equals && get[0].equals(0.0))
+                    neg_true++;
+                else if (!equals && get[0].equals(0.0))
+                    neg_false++;
+                else if (!equals && get[0].equals(1.0))
+                    pos_false++;
 
-                for (int i = 0; i < outputNum; i++) {
-                    boolean equals = get[i].equals(desiredArr[i]);
-                    if (equals && get[i].equals(1.0))
-                        pos_true++;
-                    else if(equals && get[i].equals(0.0))
-                        neg_true++;
-                    else if(!equals && get[i].equals(0.0))
-                        pos_false++;
-                    else if(!equals && get[i].equals(1.0))
-                        neg_false++;
-                }
             }
-            avgError += correct / (training_dataSet.size() * outputNum) * 100;
-            correct = 0.0;
+
+            correct = (100*(pos_true + neg_true)) / training_dataSet.size();
+            miss = (100*(pos_false + neg_false)) / training_dataSet.size();
+            if((n+1)==maxEpoch){
+                System.out.println("pt: " + pos_true + " nt: " + neg_true + " nf: " + neg_false + " pf: " + pos_false);
+                System.out.println("correctness: " + correct);
+                System.out.println("miss: " + miss);
+            }
+
             n++;
         }
-        double correctness = avgError / n;
-        System.out.println("% Correctness: " + correctness);
     }
 
     public void testing() {
 
         System.out.println("================= TESTING =================");
-        int n = 0;
-        double avgError;
-        double correct = 0.0;
+        double correct;
+        double miss;
         int inNodeNum = nodeLayer[0];
         Random ranDataLine = new Random();
         int outputNum = nodeLayer[nodeLayerNum - 1];
+        int neg_false, neg_true, pos_false, pos_true = 0;
+        neg_false = neg_true = pos_false = pos_true;
 
         // insert input value to node
         for (int l = 0; l < testing_dataSet.size(); l++) {
@@ -195,14 +200,22 @@ public class NeuronNetwork2 {
 //                    System.out.println(get[i] + "\t");
             }
 
-            for (int i = 0; i < outputNum; i++) {
-                if (get[i].equals(desiredArr[i]))
-                    correct++;
-            }
+            boolean equals = get[0].equals(desiredArr[0]);
+            if (equals && get[0].equals(1.0))
+                pos_true++;
+            else if (equals && get[0].equals(0.0))
+                neg_true++;
+            else if (!equals && get[0].equals(0.0))
+                neg_false++;
+            else if (!equals && get[0].equals(1.0))
+                pos_false++;
         }
-        avgError = correct / (testing_dataSet.size() * outputNum) * 100;
+        correct = (100*(pos_true + neg_true)) / testing_dataSet.size();
+        miss = (100*(pos_false + neg_false)) / testing_dataSet.size();
 
-        System.out.println("% Correctness: " + (avgError));
+        System.out.println("pt: " + pos_true + " nt: " + neg_true + " nf: " + neg_false + " pf: " + pos_false);
+        System.out.println("correctness: " + correct);
+        System.out.println("miss: " + miss);
 
     }
 

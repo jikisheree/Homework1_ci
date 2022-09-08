@@ -9,7 +9,7 @@ public class mainRun {
     private static final int maxIteration1 = 10;
 
     private static final Double minError2 = 0.000001;
-    private static final int maxEpoch2 = 1000;
+    private static final int maxEpoch2 = 5000;
     private static final Double bias2 = 1.0;
     private static final Double learningRate2 = 0.04;
     private static final Double mm2 = 0.1;
@@ -39,9 +39,9 @@ public class mainRun {
         Data2_Manager.getData();
 
         // flood dataset
-        run_network1();
+//        run_network1();
         // cross dataset
-//        run_network2();
+        run_network2();
 
     }
 
