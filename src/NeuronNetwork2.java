@@ -44,11 +44,11 @@ public class NeuronNetwork2 {
 
         int hNum = hidden.length;
         this.nodeLayer = new int[hNum + 2];
-        this.nodeLayer[0] = training_dataSet.get(dataSet).size();
+        this.nodeLayer[0] = training_dataSet.get(0).size();
         for (int i = 1; i <= hNum + 1; i++) {
 
             if (i == hNum + 1) {
-                this.nodeLayer[i] = training_desired.get(dataSet).size();
+                this.nodeLayer[i] = training_desired.get(0).size();
                 this.error = new Double[this.nodeLayer[i]];
             } else
                 this.nodeLayer[i] = hidden[i - 1];

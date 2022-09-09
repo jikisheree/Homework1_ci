@@ -45,12 +45,12 @@ public class NeuronNetwork {
         int hNum = hidden.length;
         this.nodeLayer = new int[hNum + 2];
         // add input nodes
-        this.nodeLayer[0] = training_dataSet.get(dataSet).size();
+        this.nodeLayer[0] = training_dataSet.get(0).size();
         for (int i = 1; i <= hNum + 1; i++) {
 
             if (i == hNum + 1) {
                 // add output nodes
-                this.nodeLayer[i] = training_desired.get(dataSet).size();
+                this.nodeLayer[i] = training_desired.get(0).size();
                 this.error = new Double[this.nodeLayer[i]];
             } else
                 // add hidden nodes
@@ -89,7 +89,9 @@ public class NeuronNetwork {
         double avgError = 10000.0;
         int inNodeNum = nodeLayer[0];
         Random ranDataLine = new Random();
+
         while (n < maxEpoch && avgError > minError) {
+            // sum of error in each epoch
             double sum_error = 0.0;
             // insert input value to node
             for (int l = 0; l < training_dataSet.size(); l++) {
@@ -109,11 +111,14 @@ public class NeuronNetwork {
 
                 sum_error += 0.5 * Math.pow(error[0], 2);
             }
+            // average of error in each epoch
             avgError = sum_error / training_dataSet.size();
 //            System.out.println("N epoch: "+n +"\t" + avgError);
             n++;
         }
-
+        // print avg error in the last epoch
+        System.out.println("sum error: "+(avgError*training_dataSet.size()));
+        System.out.println("data size: "+training_dataSet.size());
         System.out.println("final Average error: " + avgError);
     }
 
