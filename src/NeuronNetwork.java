@@ -124,22 +124,22 @@ public class NeuronNetwork {
         int inNodeNum = nodeLayer[0];
         double sum_error = 0.0;
 
-        for (int l = 0; l < Data1_Manager.testing_dataSet.size(); l++) {
+        for (int l = 0; l < testing_dataSet.size(); l++) {
             // insert input value to node
             for (int i = 0; i < inNodeNum; i++) {
-                this.node[0][i] = Data1_Manager.getTestData(dataSet).get(l).get(i);
+                this.node[0][i] = testing_dataSet.get(l).get(i);
             }
 
             feedForward();
             errorCalculation(l, false);
 
-            double d = Data1_Manager.getTestDs(dataSet).get(l).get(0) * 700;
+            double d = testing_desired.get(l).get(0) * 700;
             double g = node[nodeLayerNum - 1][0] * 700;
             System.out.println("desired:" + (int) d + " get: " + g + "\t error_n: " + Math.abs(d - g));
 
             sum_error += 0.5 * Math.pow(error[0], 2);
         }
-        avgError = sum_error / Data1_Manager.testing_dataSet.size();
+        avgError = sum_error / testing_dataSet.size();
 
         System.out.println("Average error: " + avgError);
     }

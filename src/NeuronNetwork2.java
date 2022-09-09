@@ -8,7 +8,10 @@ public class NeuronNetwork2 {
     protected Double bias;
     protected Double learningRate;
     protected Double mmRate;
-    private List<List<Double>> training_dataSet, training_desired, testing_dataSet, testing_desired;
+    private final List<List<Double>> training_dataSet;
+    private final List<List<Double>> training_desired;
+    private final List<List<Double>> testing_dataSet;
+    private final List<List<Double>> testing_desired;
     private Double[][] node, local_gradient;
     private int[] nodeLayer;
     private WeightGraph[] weightOfLayer;
@@ -16,7 +19,7 @@ public class NeuronNetwork2 {
     private Double[] error;
     private int weightLayerNum;
     private int nodeLayerNum;
-    private int dataSet;
+    private final int dataSet;
 
     public NeuronNetwork2(Double minError, Double learningRate, Double mm, int maxEpoch, Double bias,
                           int[] hidden, int dataSet) {

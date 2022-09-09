@@ -39,9 +39,9 @@ public class mainRun {
         Data2_Manager.getData();
 
         // flood dataset
-//        run_network1();
+        run_network1();
         // cross dataset
-        run_network2();
+//        run_network2();
 
     }
 
