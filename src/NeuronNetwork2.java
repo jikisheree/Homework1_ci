@@ -88,7 +88,7 @@ public class NeuronNetwork2 {
 
         while (n < maxEpoch && correct<99) {
 
-            int neg_false, neg_true, pos_false, pos_true = 0;
+            double neg_false, neg_true, pos_false, pos_true = 0.0;
             neg_false = neg_true = pos_false = pos_true;
 
             // insert input value to node
