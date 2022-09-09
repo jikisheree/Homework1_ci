@@ -142,7 +142,8 @@ public class NeuronNetwork {
             double g = node[nodeLayerNum - 1][0] * 700;
             System.out.println("desired:" + (int) d + " get: " + g + "\t error_n: " + Math.abs(d - g));
 
-            sum_error += 0.5 * Math.pow(error[0], 2);
+            sum_error += 0.5 * Math.pow((error[0]), 2);
+            System.out.println("sum error "+(l+1)+ ": "+sum_error);
         }
         avgError = sum_error / testing_dataSet.size();
 
