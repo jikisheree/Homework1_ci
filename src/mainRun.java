@@ -15,7 +15,7 @@ public class mainRun {
     private static final Double bias2 = 1.0;
     private static final Double learningRate2 = 0.02;
     private static final Double mm2 = 0.6;
-    private static final int[] hidden2 = {3,3,3,3};
+    private static final int[] hidden2 = {5,10,10,5};
     private static final int maxIteration2 = 10;
 
     // run training and testing on neuron network 1

@@ -89,8 +89,6 @@ public class NeuronNetwork1 {
         System.out.println("================= TRAINING " + (dataSet + 1) + " =================");
         // epoch iteration count
         int n = 0;
-        // sum of error in each epoch
-        double sum_error = 0.0;
         // declaring average error
         double avgError = 10000.0;
         // loading number of input nodes
@@ -102,6 +100,9 @@ public class NeuronNetwork1 {
            or the average error is less than minError, then exit the iteration
         */
         while (n < maxEpoch && avgError > minError) {
+
+            // sum of error in each epoch
+            double sum_error = 0.0;
 
             // iteration of each line of data in a data set
             for (int l = 0; l < training_dataSet.size(); l++) {
@@ -119,7 +120,7 @@ public class NeuronNetwork1 {
                 // console out
                 double d = training_desired.get(lineNum).get(0) * 700;
                 double g = nodeValue[nodeLayerNum - 1][0] * 700;
-//              System.out.println("desired:" + (int)d + " get: "+ g + "\t error_n: " + Math.abs(d-g));
+//                System.out.println("desired:" + (int)d + " get: "+ g + "\t error_n: " + Math.abs(d-g));
 
                 // add the mean squared error of each data in this epoch to the summation of error
                 sum_error += 0.5 * Math.pow(error[0], 2);

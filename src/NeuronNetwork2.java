@@ -96,10 +96,10 @@ public class NeuronNetwork2 {
         double miss;
         // loading number of input nodes
         int inNodeNum = nodeNum[0];
-        // random line of data in a data set
-        Random ranDataLine = new Random();
         // loading number of output nodes
         int outputNum = nodeNum[nodeLayerNum - 1];
+        // random line of data in a data set
+        Random ranDataLine = new Random();
 
         /* iteration of each epoch in condition if the number of iteration
            is more than maxEpoch, then exit the iteration
@@ -198,6 +198,8 @@ public class NeuronNetwork2 {
         int inNodeNum = nodeNum[0];
         // loading number of output nodes
         int outputNum = nodeNum[nodeLayerNum - 1];
+        // random line of data in a data set
+        Random ranDataLine = new Random();
 
         /* these variable store the number of true positive, true negative,
            false positive, and false negative output (confusion matrix) in an epoch
@@ -207,6 +209,8 @@ public class NeuronNetwork2 {
 
         // iteration of each line of data in a data set
         for (int l = 0; l < testing_dataSet.size(); l++) {
+            // insert the value from a randomized line of a data set into input nodes
+            int lineNum = ranDataLine.nextInt(training_dataSet.size());
             for (int i = 0; i < inNodeNum; i++) {
                 this.nodeValue[0][i] = testing_dataSet.get(l).get(i);
             }
