@@ -204,15 +204,15 @@ public class NeuronNetwork2 {
         /* these variable store the number of true positive, true negative,
            false positive, and false negative output (confusion matrix) in an epoch
         */
-        int neg_false, neg_true, pos_false, pos_true = 0;
+        double neg_false, neg_true, pos_false, pos_true = 0;
         neg_false = neg_true = pos_false = pos_true;
 
         // iteration of each line of data in a data set
         for (int l = 0; l < testing_dataSet.size(); l++) {
             // insert the value from a randomized line of a data set into input nodes
-            int lineNum = ranDataLine.nextInt(training_dataSet.size());
+            int lineNum = ranDataLine.nextInt(testing_dataSet.size());
             for (int i = 0; i < inNodeNum; i++) {
-                this.nodeValue[0][i] = testing_dataSet.get(l).get(i);
+                this.nodeValue[0][i] = testing_dataSet.get(lineNum).get(i);
             }
 
             // feed forward -> find errors
@@ -224,19 +224,21 @@ public class NeuronNetwork2 {
             Double[] outputArr = new Double[outputNum];
             Double[] desiredArr = new Double[outputNum];
             Double[] get = new Double[outputNum];
+
 //                System.out.println("desired: ");
             // store value into the 'desired' array
             for (int i = 0; i < outputNum; i++) {
-                desiredArr[i] = this.training_desired.get(l).get(i);
-//                    System.out.println(desiredArr[i]+"\t");
+                desiredArr[i] = testing_desired.get(lineNum).get(i);
+//                    System.out.println(desiredArr[i] + "\t");
             }
-//                System.out.println("Got: ");
 
-                /* finding index(i) of output that has max value, so we can remember this index
+//                System.out.println("Got: ");
+            /* finding index(i) of output that has max value, so we can remember this index
                 and store the value in 'get' array to be 1 (nn predicted that output is in class i)
                 */
             // store value into the 'output' array and store the index
             // of output that return the maximum value
+
             int maxIndex = 0;
             for (int i = 0; i < outputNum; i++) {
                 outputArr[i] = nodeValue[nodeLayerNum - 1][i];
@@ -244,6 +246,7 @@ public class NeuronNetwork2 {
                     maxIndex = i;
                 }
             }
+
             // if output(i) has maximum value then store 1, else store 0 into the 'get' array
             for (int i = 0; i < outputNum; i++) {
                 if (i == maxIndex) {
