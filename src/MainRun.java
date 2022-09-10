@@ -1,4 +1,4 @@
-public class mainRun {
+public class MainRun {
 
     // set a structure to neuron network 1
     private static final Double minError1 = 0.000001;
@@ -38,8 +38,8 @@ public class mainRun {
 
     public static void main(String[] args) {
 
-        Data1_Manager.getData();
-        Data2_Manager.getData();
+        FloodData_Manager.getData();
+        CrossData_Manager.getData();
 
         // flood dataset
         run_network1();

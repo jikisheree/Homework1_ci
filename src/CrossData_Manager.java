@@ -4,26 +4,26 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Data1_Manager {
+public class CrossData_Manager {
 
     // setting path of source data set
-    protected static String inFile = "src/Flood_dataset.txt";
+    protected static String inFile = "src/cross.pat";
     // lists that store all data sets
     protected static List<List<List<Double>>> training_dataSet = new LinkedList<>();
     protected static List<List<List<Double>>> training_desired = new LinkedList<>();
     protected static List<List<List<Double>>> testing_dataSet = new LinkedList<>();
     protected static List<List<List<Double>>> testing_desired = new LinkedList<>();
-    protected static Data1_Manager data;
+    protected static CrossData_Manager data;
 
     static {
         try {
-            data = new Data1_Manager();
+            data = new CrossData_Manager();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Data1_Manager() throws IOException {
+    public CrossData_Manager() throws IOException {
 
         for (int dataSet = 0; dataSet < 10; dataSet++) {
             FileReader fr = new FileReader(inFile);
@@ -36,33 +36,38 @@ public class Data1_Manager {
                 List<List<Double>> sub_testing_desired = new LinkedList<>();
 
                 // count lines
-                int lines = 0;
+                int lines = 1;
                 String data;
 
                 /* splitting data into each type of list which are training dataset,
                    training desired output, testing dataset, and testing desired output
                  */
                 while ((data = reader.readLine()) != null) {
+
+                    if (lines % 3 == 0 || (lines + 1) % 3 == 0) {
+
+                        String[] eachLine = data.split("\\s+");
+
+                        List<Double> temp = new LinkedList<>();
+
+                        for (String eachNum : eachLine) {
+                            Double dataNum = Double.parseDouble(eachNum);
+                            temp.add(dataNum);
+                        }
+
+                        if (lines % 3 == 0) {
+                            if (lines % 10 == dataSet) {
+                                sub_testing_desired.add(temp);
+                            } else
+                                sub_training_desired.add(temp);
+                        } else if ((lines + 1) % 3 == 0) {
+                            if ((lines + 1) % 10 == dataSet) {
+                                sub_testing_dataSet.add(temp);
+                            } else
+                                sub_training_dataSet.add(temp);
+                        }
+                    }
                     lines++;
-
-                    String[] eachLine = data.split("\t");
-
-                    List<Double> Input_line = new LinkedList<>();
-                    List<Double> Desired_line = new LinkedList<>();
-                    for (String eachNum : eachLine) {
-                        Double dataNum = Double.parseDouble(eachNum) / 700;
-                        Input_line.add(dataNum);
-                    }
-                    Desired_line.add(Input_line.get(Input_line.size() - 1));
-                    Input_line.remove(Input_line.size() - 1);
-
-                    if (lines % (10) == dataSet) {
-                        sub_testing_dataSet.add(Input_line);
-                        sub_testing_desired.add(Desired_line);
-                    } else {
-                        sub_training_dataSet.add(Input_line);
-                        sub_training_desired.add(Desired_line);
-                    }
                 }
                 // insert a data set into a list of each type of data
                 training_dataSet.add(sub_training_dataSet);
@@ -70,7 +75,6 @@ public class Data1_Manager {
                 testing_dataSet.add(sub_testing_dataSet);
                 testing_desired.add(sub_testing_desired);
             }
-
         }
     }
 
@@ -78,7 +82,7 @@ public class Data1_Manager {
         inFile = path;
     }
 
-    public static Data1_Manager getData() {
+    public static CrossData_Manager getData() {
         return data;
     }
 
@@ -101,8 +105,7 @@ public class Data1_Manager {
 
     public static void main(String[] args) {
 
-        Data1_Manager.getData();
+        CrossData_Manager.getData();
+
     }
 }
-
-

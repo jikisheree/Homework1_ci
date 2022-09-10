@@ -32,10 +32,10 @@ public class NeuronNetwork2 {
         this.dataSet = dataSet;
 
         // loading the organized lists pf the data set
-        this.training_dataSet = Data2_Manager.getTrainData(this.dataSet);
-        this.training_desired = Data2_Manager.getTrainDs(this.dataSet);
-        this.testing_dataSet = Data2_Manager.getTestData(this.dataSet);
-        this.testing_desired = Data2_Manager.getTestDs(this.dataSet);
+        this.training_dataSet = CrossData_Manager.getTrainData(this.dataSet);
+        this.training_desired = CrossData_Manager.getTrainDs(this.dataSet);
+        this.testing_dataSet = CrossData_Manager.getTestData(this.dataSet);
+        this.testing_desired = CrossData_Manager.getTestDs(this.dataSet);
 
         // build the multi-layer perceptron
         MLPBuilding(hidden);
