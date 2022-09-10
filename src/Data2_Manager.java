@@ -8,7 +8,9 @@ import java.util.List;
 
 public class Data2_Manager {
 
+    // setting path of source data set
     protected static String inFile = "src/cross.pat";
+    // lists that store all data sets
     protected static List<List<List<Double>>> training_dataSet = new LinkedList<>();
     protected static List<List<List<Double>>> training_desired = new LinkedList<>();
     protected static List<List<List<Double>>> testing_dataSet = new LinkedList<>();
@@ -29,7 +31,7 @@ public class Data2_Manager {
             FileReader fr = new FileReader(inFile);
             BufferedReader reader = new BufferedReader(fr);
             {
-
+                // lists that store each data set
                 List<List<Double>> sub_training_dataSet = new LinkedList<>();
                 List<List<Double>> sub_training_desired = new LinkedList<>();
                 List<List<Double>> sub_testing_dataSet = new LinkedList<>();
@@ -39,6 +41,9 @@ public class Data2_Manager {
                 int lines = 1;
                 String data;
 
+                /* splitting data into each type of list which are training dataset,
+                   training desired output, testing dataset, and testing desired output
+                 */
                 while ((data = reader.readLine()) != null) {
 
                     if (lines % 3 == 0 || (lines + 1) % 3 == 0) {
@@ -64,10 +69,9 @@ public class Data2_Manager {
                                 sub_training_dataSet.add(temp);
                         }
                     }
-
                     lines++;
                 }
-                // insert data into sets
+                // insert a data set into a list of each type of data
                 training_dataSet.add(sub_training_dataSet);
                 training_desired.add(sub_training_desired);
                 testing_dataSet.add(sub_testing_dataSet);
@@ -84,6 +88,7 @@ public class Data2_Manager {
         return data;
     }
 
+    /* these function below will be used for accessing data set the neuron network */
     public static List<List<Double>> getTrainData(int dataSet) {
         return training_dataSet.get(dataSet);
     }

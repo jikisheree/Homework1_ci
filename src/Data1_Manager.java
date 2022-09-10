@@ -1,14 +1,14 @@
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Data1_Manager {
 
+    // setting path of source data set
     protected static String inFile = "src/Flood_dataset.txt";
+    // lists that store all data sets
     protected static List<List<List<Double>>> training_dataSet = new LinkedList<>();
     protected static List<List<List<Double>>> training_desired = new LinkedList<>();
     protected static List<List<List<Double>>> testing_dataSet = new LinkedList<>();
@@ -29,16 +29,19 @@ public class Data1_Manager {
             FileReader fr = new FileReader(inFile);
             BufferedReader reader = new BufferedReader(fr);
             {
-
+                // lists that store each data set
                 List<List<Double>> sub_training_dataSet = new LinkedList<>();
                 List<List<Double>> sub_training_desired = new LinkedList<>();
                 List<List<Double>> sub_testing_dataSet = new LinkedList<>();
                 List<List<Double>> sub_testing_desired = new LinkedList<>();
 
+                // count lines
                 int lines = 0;
                 String data;
 
-                // checking each line
+                /* splitting data into each type of list which are training dataset,
+                   training desired output, testing dataset, and testing desired output
+                 */
                 while ((data = reader.readLine()) != null) {
                     lines++;
 
@@ -61,8 +64,7 @@ public class Data1_Manager {
                         sub_training_desired.add(Desired_line);
                     }
                 }
-
-                // insert data into sets
+                // insert a data set into a list of each type of data
                 training_dataSet.add(sub_training_dataSet);
                 training_desired.add(sub_training_desired);
                 testing_dataSet.add(sub_testing_dataSet);
@@ -80,6 +82,7 @@ public class Data1_Manager {
         return data;
     }
 
+    /* these function below will be used for accessing data set the neuron network */
     public static List<List<Double>> getTrainData(int dataSet) {
         return training_dataSet.get(dataSet);
     }

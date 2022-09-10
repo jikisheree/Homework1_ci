@@ -1,7 +1,7 @@
 import java.util.List;
 import java.util.Random;
 
-public class NeuronNetwork2 {
+public class NeuronNetwork1 {
 
     protected Double minError;
     protected int maxEpoch;
@@ -21,8 +21,8 @@ public class NeuronNetwork2 {
     private int nodeLayerNum;
     private final int dataSet;
 
-    public NeuronNetwork2(Double minError, Double learningRate, Double mm, int maxEpoch, Double bias,
-                         int[] hidden, int dataSet) {
+    public NeuronNetwork1(Double minError, Double learningRate, Double mm, int maxEpoch, Double bias,
+                          int[] hidden, int dataSet) {
 
         this.minError = minError;
         this.learningRate = learningRate;
@@ -32,10 +32,10 @@ public class NeuronNetwork2 {
         this.dataSet = dataSet;
 
         // loading the organized lists pf the data set
-        this.training_dataSet = Data2_Manager.getTrainData(this.dataSet);
-        this.training_desired = Data2_Manager.getTrainDs(this.dataSet);
-        this.testing_dataSet = Data2_Manager.getTestData(this.dataSet);
-        this.testing_desired = Data2_Manager.getTestDs(this.dataSet);
+        this.training_dataSet = Data1_Manager.getTrainData(this.dataSet);
+        this.training_desired = Data1_Manager.getTrainDs(this.dataSet);
+        this.testing_dataSet = Data1_Manager.getTestData(this.dataSet);
+        this.testing_desired = Data1_Manager.getTestDs(this.dataSet);
 
         // build the multi-layer perceptron
         MLPBuilding(hidden);
@@ -84,33 +84,24 @@ public class NeuronNetwork2 {
 
     }
 
-
     public void training() {
 
-        System.out.println("\n================= TRAINING "+(dataSet+1)+" =================");
+        System.out.println("================= TRAINING " + (dataSet + 1) + " =================");
         // epoch iteration count
         int n = 0;
-        // % of accuracy in each epoch
-        double accuracy;
-        // % of miss classification in each epoch
-        double miss;
+        // sum of error in each epoch
+        double sum_error = 0.0;
+        // declaring average error
+        double avgError = 10000.0;
         // loading number of input nodes
         int inNodeNum = nodeNum[0];
         // random line of data in a data set
         Random ranDataLine = new Random();
-        // loading number of output nodes
-        int outputNum = nodeNum[nodeLayerNum - 1];
 
-        /* iteration of each epoch in condition if the number of iteration
-           is more than maxEpoch, then exit the iteration
+        /* iteration of each epoch in condition if the number of iteration is more than maxEpoch
+           or the average error is less than minError, then exit the iteration
         */
-        while (n < maxEpoch ) {
-
-            /* these variable store the number of true positive, true negative,
-            false positive, and false negative output (confusion matrix) in an epoch
-            */
-            double neg_false, neg_true, pos_false, pos_true = 0.0;
-            neg_false = neg_true = pos_false = pos_true;
+        while (n < maxEpoch && avgError > minError) {
 
             // iteration of each line of data in a data set
             for (int l = 0; l < training_dataSet.size(); l++) {
@@ -125,88 +116,32 @@ public class NeuronNetwork2 {
                 errorCalculation(lineNum, true);
                 backPropagation();
 
-                /* finding number of variable from the confusion matrix */
-                // these array store number of desired and predicted outputs
-                Double[] outputArr = new Double[outputNum];
-                Double[] desiredArr = new Double[outputNum];
-                Double[] get = new Double[outputNum];
-//                System.out.println("desired: ");
-                // store value into the 'desired' array
-                for (int i = 0; i < outputNum; i++) {
-                    desiredArr[i] = this.training_desired.get(lineNum).get(i);
-//                    System.out.println(desiredArr[i]+"\t");
-                }
-//                System.out.println("Got: ");
+                // console out
+                double d = training_desired.get(lineNum).get(0) * 700;
+                double g = nodeValue[nodeLayerNum - 1][0] * 700;
+//              System.out.println("desired:" + (int)d + " get: "+ g + "\t error_n: " + Math.abs(d-g));
 
-                /* finding index(i) of output that has max value, so we can remember this index
-                and store the value in 'get' array to be 1 (nn predicted that output is in class i)
-                */
-                // store value into the 'output' array and store the index
-                // of output that return the maximum value
-                int maxIndex = 0;
-                for (int i = 0; i < outputNum; i++) {
-                    outputArr[i] = nodeValue[nodeLayerNum - 1][i];
-                    if (i > 0 && outputArr[i] > outputArr[i - 1]) {
-                        maxIndex = i;
-                    }
-                }
-                // if output(i) has maximum value then store 1, else store 0 into the 'get' array
-                for (int i = 0; i < outputNum; i++) {
-                    if (i == maxIndex) {
-                        get[i] = 1.0;
-                    } else {
-                        get[i] = 0.0;
-                    }
-//                    System.out.println(get[i] + "\t");
-                }
-
-                // find number of true positive, true negative,
-                // false positive, and false negative output (confusion matrix)
-                boolean equals = get[0].equals(desiredArr[0]);
-                if (equals && get[0].equals(1.0))
-                    pos_true++;
-                else if (equals && get[0].equals(0.0))
-                    neg_true++;
-                else if (!equals && get[0].equals(0.0))
-                    neg_false++;
-                else if (!equals && get[0].equals(1.0))
-                    pos_false++;
-
+                // add the mean squared error of each data in this epoch to the summation of error
+                sum_error += 0.5 * Math.pow(error[0], 2);
             }
-            /* calculate the accuracy and miss classification in each epoch */
-            accuracy = (100*(pos_true + neg_true)) / training_dataSet.size();
-            miss = (100*(pos_false + neg_false)) / training_dataSet.size();
-
-            // console out
-            if((n+1)==maxEpoch){
-                System.out.println("pt: " + pos_true + " nt: " + neg_true + " nf: " + neg_false + " pf: " + pos_false);
-                System.out.println("correctness: " + accuracy);
-                System.out.println("miss: " + miss);
-            }
+            // average error of each epoch
+            avgError = sum_error / training_dataSet.size();
+//            System.out.println("N epoch: "+n +"\t" + avgError);
             n++;
         }
+        // print avg error in the last epoch
+        System.out.println("final Average error: " + avgError);
     }
 
     public void testing() {
 
         System.out.println("================= TESTING =================");
-        // % of accuracy in each epoch
-        double accuracy;
-        // % of miss classification in each epoch
-        double miss;
-        // loading number of input nodes
+        double avgError;
         int inNodeNum = nodeNum[0];
-        // loading number of output nodes
-        int outputNum = nodeNum[nodeLayerNum - 1];
+        double sum_error = 0.0;
 
-        /* these variable store the number of true positive, true negative,
-           false positive, and false negative output (confusion matrix) in an epoch
-        */
-        int neg_false, neg_true, pos_false, pos_true = 0;
-        neg_false = neg_true = pos_false = pos_true;
-
-        // iteration of each line of data in a data set
         for (int l = 0; l < testing_dataSet.size(); l++) {
+            // insert input value to node
             for (int i = 0; i < inNodeNum; i++) {
                 this.nodeValue[0][i] = testing_dataSet.get(l).get(i);
             }
@@ -215,62 +150,18 @@ public class NeuronNetwork2 {
             feedForward();
             errorCalculation(l, false);
 
-            /* finding number of variable from the confusion matrix */
-            // these array store number of desired and predicted outputs
-            Double[] outputArr = new Double[outputNum];
-            Double[] desiredArr = new Double[outputNum];
-            Double[] get = new Double[outputNum];
-//                System.out.println("desired: ");
-            // store value into the 'desired' array
-            for (int i = 0; i < outputNum; i++) {
-                desiredArr[i] = this.training_desired.get(l).get(i);
-//                    System.out.println(desiredArr[i]+"\t");
-            }
-//                System.out.println("Got: ");
+            // console out
+            double d = testing_desired.get(l).get(0) * 700;
+            double g = nodeValue[nodeLayerNum - 1][0] * 700;
+//            System.out.println("desired:" + (int) d + " get: " + g + "\t error_n: " + Math.abs(d - g));
 
-                /* finding index(i) of output that has max value, so we can remember this index
-                and store the value in 'get' array to be 1 (nn predicted that output is in class i)
-                */
-            // store value into the 'output' array and store the index
-            // of output that return the maximum value
-            int maxIndex = 0;
-            for (int i = 0; i < outputNum; i++) {
-                outputArr[i] = nodeValue[nodeLayerNum - 1][i];
-                if (i > 0 && outputArr[i] > outputArr[i - 1]) {
-                    maxIndex = i;
-                }
-            }
-            // if output(i) has maximum value then store 1, else store 0 into the 'get' array
-            for (int i = 0; i < outputNum; i++) {
-                if (i == maxIndex) {
-                    get[i] = 1.0;
-                } else {
-                    get[i] = 0.0;
-                }
-//                    System.out.println(get[i] + "\t");
-            }
-
-            // find number of true positive, true negative,
-            // false positive, and false negative output (confusion matrix)
-            boolean equals = get[0].equals(desiredArr[0]);
-            if (equals && get[0].equals(1.0))
-                pos_true++;
-            else if (equals && get[0].equals(0.0))
-                neg_true++;
-            else if (!equals && get[0].equals(0.0))
-                neg_false++;
-            else if (!equals && get[0].equals(1.0))
-                pos_false++;
+            // add the mean squared error of each data in this epoch to the summation of error
+            sum_error += 0.5 * Math.pow((error[0]), 2);
         }
-        /* calculate the accuracy and miss classification in each epoch */
-        accuracy = (100*(pos_true + neg_true)) / testing_dataSet.size();
-        miss = (100*(pos_false + neg_false)) / testing_dataSet.size();
+        // average error of each epoch
+        avgError = sum_error / testing_dataSet.size();
 
-        // console out
-        System.out.println("pt: " + pos_true + " nt: " + neg_true + " nf: " + neg_false + " pf: " + pos_false);
-        System.out.println("correctness: " + accuracy);
-        System.out.println("miss: " + miss);
-
+        System.out.println("Average error: " + avgError);
     }
 
     public void feedForward() {
